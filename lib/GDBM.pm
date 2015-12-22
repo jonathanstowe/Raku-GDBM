@@ -25,6 +25,11 @@ class GDBM does Associative {
     my class File is repr('CPointer') {
         sub gdbm_open(Str $file, int $bs, int $flags, int $mode, &fatal ( Str $message)) returns File is native('libgdbm') { * }
 
+        multi method new(Str() :$file, Int :$block-size = 512, Int() :$flags = Create, Int :$mode = 0o644) returns File {
+            gdbm_open($file, $block-size, $flags, $mode, &fail);
+
+        }
+
     }
 }
 # vim: ft=perl6 expandtab sw=4
