@@ -14,6 +14,14 @@ class GDBM does Associative {
         has int $.dsize is rw;
     }
 
+    class X::Fatal is Exception {
+        has Str $.message;
+    }
+
+    sub fail(Str $message) {
+        X::Fatal.new(:$message).throw;
+    }
+
     my class File is repr('CPointer') {
         sub gdbm_open(Str $file, int $bs, int $flags, int $mode, &fatal ( Str $message)) returns File is native('libgdbm') { * }
 
