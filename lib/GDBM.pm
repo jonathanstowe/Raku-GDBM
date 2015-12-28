@@ -9,16 +9,22 @@ class GDBM does Associative {
     
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
-    my class Datum is repr('CStruct') {
-        has Str $.dptr is rw;
-        has int $.dsize is rw;
+    class Datum is repr('CStruct') {
+        has Str   $.dptr;
+        has int32 $.dsize;
 
-        multi method new(Str $val) {
-            my int $dsize = $val.encode.bytes;
-            self.new(dptr => $val, :$dsize);
+        multi method new(Str() $val) {
+            explicitly-manage($val);
+            my int32 $dsize = $val.encode.bytes;
+            self.bless(dptr => $val, :$dsize);
         }
 
-        method Str() {
+        submethod BUILD(:$dptr, :$dsize) {
+            $!dptr := $dptr.Str;
+            $!dsize = $dsize;
+        }
+
+        method xStr() {
             $!dptr;
         }
     }
@@ -27,15 +33,17 @@ class GDBM does Associative {
         has Str $.message;
     }
 
-    sub fail(Str $message) {
-        X::Fatal.new(:$message).throw;
+    sub fail(Str $message ) {
+        explicitly-manage($message);
+        #X::Fatal.new(:$message).throw;
     }
 
     my class File is repr('CPointer') {
-        sub gdbm_open(Str $file, int $bs, int $flags, int $mode, &fatal ( Str $message)) returns File is native('gdbm',v4) { * }
+        sub gdbm_open(Str $file, int32 $bs, int32 $flags, int32 $mode, &fatal ( Str $message )) returns File is native('gdbm',v4) { * }
 
         multi method new(Str() :$file, Int :$block-size = 512, Int() :$flags = Create +| Sync, Int :$mode = 0o644) returns File {
-            gdbm_open($file, $block-size, $flags, $mode, &fail);
+            explicitly-manage($file);
+            gdbm_open($file, $block-size, $flags, $mode, Code);
 
         }
 
@@ -45,14 +53,18 @@ class GDBM does Associative {
             gdbm_close(self);
         }
 
-        sub gdbm_store(File $f, Datum $k, Datum $v, int $m) returns int is native('gdbm',v4) { * }
+        sub gdbm_store(File $f, Datum $k, Datum $v, int32 $m) returns int32 is native('gdbm',v4) { * }
 
-        multi method store(Datum $k, Datum $v, StoreOptions $flag = Replace) returns Int {
+        multi method store(Datum:D $k, Datum:D $v, StoreOptions $flag = Replace) returns Int {
+            say "store { $k.perl } => { $v.perl }";
             gdbm_store(self, $k, $v, $flag.Int);
         }
 
-        multi method store(Str $k, Str $v, StoreOptions $flag = Replace) returns Int {
-            self.store(Datum.new($k), Datum.new($v), $flag);
+        multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace) returns Int {
+            say "store $k => $v";
+            my $key = Datum.new($k);
+            my $val = Datum.new($v);
+            self.store($key, $val, $flag);
         }
 
         sub gdbm_fetch(File $f, Datum $k) returns Datum is native('gdbm',v4) { * }
@@ -66,7 +78,7 @@ class GDBM does Associative {
             self.fetch(Datum.new($k));
         }
 
-        sub gdbm_delete(File $f, Datum $k) returns int is native('gdbm',v4) { * }
+        sub gdbm_delete(File $f, Datum $k) returns int32 is native('gdbm',v4) { * }
         multi method delete(Datum $k) returns Int {
             gdbm_delete(self, $k);
         }
@@ -91,7 +103,7 @@ class GDBM does Associative {
             gdbm_nextkey(self, $prev);
         }
 
-        sub gdbm_reorganize (File $f) returns int is native('gdbm',v4) { * }
+        sub gdbm_reorganize (File $f) returns int32 is native('gdbm',v4) { * }
 
         method reorganize() returns Int {
             gdbm_reorganize(self);
@@ -103,7 +115,7 @@ class GDBM does Associative {
             gdbm_sync(self);
         }
 
-        sub gdbm_exists(File $f, Datum $k) returns int is native('gdbm',v4) { * }
+        sub gdbm_exists(File $f, Datum $k) returns int32 is native('gdbm',v4) { * }
         multi method exists(Datum $k) returns Bool {
             my Int $rc = gdbm_exists(self, $k);
             return Bool($rc);
@@ -113,7 +125,7 @@ class GDBM does Associative {
             self.exists(Datum.new($k));
         }
 
-        sub gdbm_count(File $f, CArray[uint64] $pcount) returns int is native('gdbm',v4) { * }
+        sub gdbm_count(File $f, CArray[uint64] $pcount) returns int32 is native('gdbm',v4) { * }
 
         method count() returns Int {
             my CArray[uint64] $pcount = CArray[uint64].new;
@@ -132,6 +144,29 @@ class GDBM does Associative {
     }
 
     multi submethod BUILD(File :$!file ) {
+    }
+
+    multi method EXISTS-KEY (::?CLASS:D: $key) {
+        self.exists($key);
+    }
+
+    multi method DELETE-KEY (::?CLASS:D: $key) {
+        self.delete($key);
+    }
+
+    multi method ASSIGN-KEY (::?CLASS:D: Str $key, Str $new) {
+        self.store($key, $new);
+    }
+
+    multi method AT-KEY (::?CLASS:D $self: $key) {
+        Proxy.new(
+            FETCH   =>  method () {
+                $self.fetch($key);
+            },
+            STORE   => method ($val) {
+                self.store($key, $val, Replace);
+            }
+        );
     }
 }
 # vim: ft=perl6 expandtab sw=4
