@@ -20,3 +20,5 @@ nytprof.out
 /_eumm/
 .precomp
 *.rev-deps
+*.db
+a.out
