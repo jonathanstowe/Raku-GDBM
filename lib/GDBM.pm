@@ -1,6 +1,7 @@
 use v6;
 
 use NativeCall;
+use NativeHelpers::Array;
 
 class GDBM does Associative {
     enum OpenMode ( Reader => 0, Writer => 1, Create => 2, New => 3);
@@ -9,23 +10,26 @@ class GDBM does Associative {
     
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
-    class Datum is repr('CStruct') {
-        has Str   $.dptr;
-        has int32 $.dsize;
+    class Datum is repr('CStruct') is rw {
+        has CArray          $.dptr;
+        has int32           $.dsize;
 
         multi method new(Str() $val) {
-            explicitly-manage($val);
-            my int32 $dsize = $val.encode.bytes;
-            self.bless(dptr => $val, :$dsize);
+            my $buf = $val.encode; 
+            my int32 $dsize = $buf.bytes;
+            self.new(dptr => $buf, :$dsize);
         }
 
         submethod BUILD(:$dptr, :$dsize) {
-            $!dptr := $dptr.Str;
+
+            my $a := copy-buf-to-carray(Buf.new($dptr.list));
+
+            $!dptr := $a;
             $!dsize = $dsize;
         }
 
-        method xStr() {
-            $!dptr;
+        method Str() {
+            copy-carray-to-buf($!dptr, $!dsize).decode;
         }
     }
 
@@ -155,7 +159,7 @@ class GDBM does Associative {
     }
 
     multi method ASSIGN-KEY (::?CLASS:D: Str $key, Str $new) {
-        self.store($key, $new);
+        self.store($key, $new, Replace);
     }
 
     multi method AT-KEY (::?CLASS:D $self: $key) {
