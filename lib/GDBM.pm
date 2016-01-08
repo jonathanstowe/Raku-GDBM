@@ -11,19 +11,20 @@ class GDBM does Associative {
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
     class Datum is repr('CStruct') is rw {
-        has CArray          $.dptr;
-        has int32           $.dsize;
+        has CArray           $.dptr  is rw;
+        has uint32           $.dsize is rw;
 
         multi method new(Str() $val) {
             my $buf = $val.encode; 
-            my int32 $dsize = $buf.bytes;
-            self.new(dptr => $buf, :$dsize);
+            my uint32 $dsize = $buf.bytes;
+            my $a = self.new(dptr => $buf, :$dsize);
+            $a.dsize = $dsize;
+            return $a;
         }
 
         submethod BUILD(:$dptr, :$dsize) {
 
-            my $a := copy-buf-to-carray(Buf.new($dptr.list));
-
+            my $a:= copy-buf-to-carray(Buf.new($dptr.list));
             $!dptr := $a;
             $!dsize = $dsize;
         }
@@ -39,15 +40,15 @@ class GDBM does Associative {
 
     sub fail(Str $message ) {
         explicitly-manage($message);
-        #X::Fatal.new(:$message).throw;
+        X::Fatal.new(:$message).throw;
     }
 
     my class File is repr('CPointer') {
-        sub gdbm_open(Str $file, int32 $bs, int32 $flags, int32 $mode, &fatal ( Str $message )) returns File is native('gdbm',v4) { * }
+        sub gdbm_open(Str $file, uint32 $bs, uint32 $flags, uint32 $mode, &fatal ( Str $message )) returns File is native('gdbm',v4) { * }
 
-        multi method new(Str() :$file, Int :$block-size = 512, Int() :$flags = Create +| Sync, Int :$mode = 0o644) returns File {
+        multi method new(Str() :$file, Int :$block-size = 512, Int() :$flags = Create +| Sync +| NoMMap, Int :$mode = 0o644) returns File {
             explicitly-manage($file);
-            gdbm_open($file, $block-size, $flags, $mode, Code);
+            gdbm_open($file, $block-size, $flags, $mode, &fail);
 
         }
 
@@ -57,7 +58,7 @@ class GDBM does Associative {
             gdbm_close(self);
         }
 
-        sub gdbm_store(File $f, Datum $k, Datum $v, int32 $m) returns int32 is native('gdbm',v4) { * }
+        sub gdbm_store(File:D $f, Datum $k, Datum $v, uint32 $m) returns int32 is native('gdbm',v4) { * }
 
         multi method store(Datum:D $k, Datum:D $v, StoreOptions $flag = Replace) returns Int {
             say "store { $k.perl } => { $v.perl }";
