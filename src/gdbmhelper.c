@@ -19,18 +19,18 @@ void p_gdbm_close (GDBM_FILE file) {
 }
 
 int p_gdbm_store (GDBM_FILE file, datum *key, datum *value, int flags) {
-    return gdbm_store(file,*key, *value, flags);
+    return gdbm_store(file, *key, *value, flags);
 }
 
 datum *p_gdbm_fetch (GDBM_FILE file, datum *key) {
     datum val;
     datum *ret;
     char *dptr;
-   val = gdbm_fetch(file, *key);
+    val = gdbm_fetch(file, *key);
     ret = (datum *)malloc(sizeof(datum));
-   dptr = malloc(val.dsize);
+    ret->dptr = malloc(val.dsize);
     ret->dsize = val.dsize;
-    ret->dptr = memcpy(dptr, val.dptr, val.dsize);
+    memcpy(ret->dptr, val.dptr, val.dsize);
    return ret;
 }
 

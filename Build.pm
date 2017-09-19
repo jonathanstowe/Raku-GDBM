@@ -12,6 +12,7 @@ class Build {
          mkpath $destdir;
          my %vars = get-vars($destdir);
          %vars<gdbmhelper> = $*VM.platform-library-name('gdbmhelper'.IO).Str;
+         %vars<LIBS> ~= ' -lgdbm';
          process-makefile($srcdir, %vars);
          my $goback = $*CWD;
          chdir($srcdir);
