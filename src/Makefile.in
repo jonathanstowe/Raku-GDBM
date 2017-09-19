@@ -4,4 +4,4 @@ all: %DESTDIR%/%gdbmhelper%
 	%LD% %LDSHARED% %LDFLAGS% %LIBS% -lgdbm %LDOUT%%DESTDIR%/%gdbmhelper% gdbmhelper%O%
 
 gdbmhelper%O%: gdbmhelper.c
-	%CC% -c %CCSHARED% %CCFLAGS% %CCOUT% gdbmhelper%O% gdbmhelper.c
+	%CC% -c %CCSHARED% %CCFLAGS% %CCOUT% -lgdbm gdbmhelper%O% gdbmhelper.c
