@@ -13,23 +13,6 @@ class GDBM does Associative {
     
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
-    class Datum is repr('CStruct') is rw {
-        has str              $.dptr;
-        has uint32           $.dsize;
-
-        multi method new(Str() $val) {
-            my $buf = $val.encode; 
-            my uint32 $dsize = $buf.bytes;
-            my $a = self.bless(dptr => $val, :$dsize);
-            return $a;
-        }
-
-        method Str() {
-            say "Str";
-            Str($!dptr);
-        }
-    }
-
     class X::Fatal is Exception {
         has Str $.message;
     }
@@ -54,54 +37,37 @@ class GDBM does Associative {
             p_gdbm_close(self);
         }
 
-        sub p_gdbm_store(File:D $f, Datum $k, Datum $v, uint32 $m) returns int32 is native(HELPER) { * }
+        sub p_gdbm_store(File:D $f, Str $k, Str $v, uint32 $m) returns int32 is native(HELPER) { * }
 
-        multi method store(Datum:D $k, Datum:D $v, StoreOptions $flag = Replace) returns Int {
-            say "store { $k.perl } => { $v.perl }";
+        multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace) returns Int {
             p_gdbm_store(self, $k, $v, $flag.Int);
         }
 
-        multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace) returns Int {
-            say "store $k => $v";
-            my $key = Datum.new($k);
-            my $val = Datum.new($v);
-            self.store($key, $val, $flag);
-        }
-
-        sub p_gdbm_fetch(File $f, Datum $k) returns Datum is native(HELPER) { * }
-
-        multi method fetch(Datum $k) returns Str {
-            my $ret = p_gdbm_fetch(self, $k);
-            say $ret;
-            $ret.Str;
-        }
+        sub p_gdbm_fetch(File $f, Str $k) returns Str is native(HELPER) { * }
 
         multi method fetch(Str $k) returns Str {
-            self.fetch(Datum.new($k));
+            p_gdbm_fetch(self, $k);
         }
 
-        sub p_gdbm_delete(File $f, Datum $k) returns int32 is native(HELPER) { * }
-        multi method delete(Datum $k) returns Int {
-            p_gdbm_delete(self, $k);
-        }
+        sub p_gdbm_delete(File $f, Str $k) returns int32 is native(HELPER) { * }
 
         multi method delete(Str $k) returns Int {
-            self.delete(Datum.new($k));
+            p_gdbm_delete(self, $k);
         }
 
         # For the methods of these we'll just return the Datum as
         # we'll only be passing to next anyway
 
-        sub p_gdbm_firstkey(File $f) returns Datum is native(HELPER) { * }
+        sub p_gdbm_firstkey(File $f) returns Str is native(HELPER) { * }
 
-        multi method first-key() returns Datum {
+        multi method first-key() returns Str {
             p_gdbm_firstkey(self);
         }
 
 
-        sub p_gdbm_nextkey(File $f, Datum $prev) returns Datum is native(HELPER) { * }
+        sub p_gdbm_nextkey(File $f, Str $prev) returns Str is native(HELPER) { * }
 
-        multi method next-key(Datum $prev) returns Datum {
+        multi method next-key(Str $prev) returns Str {
             p_gdbm_nextkey(self, $prev);
         }
 
@@ -117,25 +83,11 @@ class GDBM does Associative {
             p_gdbm_sync(self);
         }
 
-        sub p_gdbm_exists(File $f, Datum $k) returns int32 is native(HELPER) { * }
-        multi method exists(Datum $k) returns Bool {
+        sub p_gdbm_exists(File $f, Str $k) returns int32 is native(HELPER) { * }
+        multi method exists(Str $k) returns Bool {
             my Int $rc = p_gdbm_exists(self, $k);
             return Bool($rc);
         }
-
-        multi method exists(Str $k) returns Bool {
-            self.exists(Datum.new($k));
-        }
-
-        sub p_gdbm_count(File $f, CArray[uint64] $pcount) returns int32 is native(HELPER) { * }
-
-        method count() returns Int {
-            my CArray[uint64] $pcount = CArray[uint64].new;
-            $pcount[0] = 0;
-            p_gdbm_count(self, $pcount);
-            return Int($pcount[0]);
-        }
-
     }
 
     has File $!file handles <fetch store exists delete sync close>;
