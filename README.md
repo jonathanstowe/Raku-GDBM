@@ -22,8 +22,6 @@ $data.close;
 
 $data = GDBM.new('somefile.db');
 
-$data<foo> = 'bar';
-
 say $data<foo>;
 
 $data.close;
