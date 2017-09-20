@@ -1,4 +1,53 @@
-use v6;
+use v6.c;
+
+=begin pod
+
+=head1 NAME
+
+GDBM - Gnu DBM binding
+
+=head1 SYMOPSIS
+
+=begin code
+
+use GDBM;
+
+my $data = GDBM.new('somefile.db');
+
+$data<foo> = 'bar';
+
+say $data<foo>:exists;
+
+$data.close;
+
+# Then in some time later, possibly in another program
+
+$data = GDBM.new('somefile.db');
+
+say $data<foo>;
+
+$data.close;
+
+=end code
+
+=head1 DESCRIPTION
+
+The L<GNU DBM|http://www.gnu.org.ua/software/gdbm/> stores key/value
+pairs in a hashed database file. Its implementation allows for keys
+and values of arbitrary length (compared to fairly frugal limits on
+some earlier implementations.)
+
+This module allows for the data to be transparently managed as if it
+were in an normal Associative container such as a Hash.  The only limitation
+currently is that both key and value must be strings (or can be meaningfully
+stringified,) so e.g. structured data will need to be serialised to some
+format that can be represented as a string.  However it can be used for
+persistence or caching if this doesn't need to be shared by processes
+on different machines.
+
+=head1 METHODS
+
+=end pod
 
 use NativeCall;
 
@@ -24,13 +73,13 @@ class GDBM does Associative {
     my class File is repr('CPointer') {
         sub p_gdbm_open(Str $file, uint32 $bs, uint32 $flags, uint32 $mode, &fatal ( Str $message )) returns File is native(HELPER) { * }
 
-        multi method new(Str() :$file, Int :$block-size = 512, Int() :$flags = Create +| Sync +| NoMMap, Int :$mode = 0o644) returns File {
+        multi method new(Str() :$file!, Int :$block-size = 512, Int() :$flags = Create +| Sync +| NoMMap, Int :$mode = 0o644) returns File {
             explicitly-manage($file);
             p_gdbm_open($file, $block-size, $flags, $mode, &fail);
 
         }
 
-        sub p_gdbm_close(File $f) is native(HELPER) { * };
+        sub p_gdbm_close(File:D $f) is native(HELPER) { * };
 
         method close() {
             p_gdbm_close(self);
@@ -42,13 +91,13 @@ class GDBM does Associative {
             p_gdbm_store(self, $k, $v, $flag.Int);
         }
 
-        sub p_gdbm_fetch(File $f, Str $k) returns Str is native(HELPER) { * }
+        sub p_gdbm_fetch(File:D $f, Str $k) returns Str is native(HELPER) { * }
 
         multi method fetch(Str $k) returns Str {
             p_gdbm_fetch(self, $k);
         }
 
-        sub p_gdbm_delete(File $f, Str $k) returns int32 is native(HELPER) { * }
+        sub p_gdbm_delete(File:D $f, Str $k) returns int32 is native(HELPER) { * }
 
         multi method delete(Str $k) returns Int {
             p_gdbm_delete(self, $k);
@@ -57,32 +106,32 @@ class GDBM does Associative {
         # For the methods of these we'll just return the Datum as
         # we'll only be passing to next anyway
 
-        sub p_gdbm_firstkey(File $f) returns Str is native(HELPER) { * }
+        sub p_gdbm_firstkey(File:D $f) returns Str is native(HELPER) { * }
 
         multi method first-key() returns Str {
             p_gdbm_firstkey(self);
         }
 
 
-        sub p_gdbm_nextkey(File $f, Str $prev) returns Str is native(HELPER) { * }
+        sub p_gdbm_nextkey(File:D $f, Str $prev) returns Str is native(HELPER) { * }
 
         multi method next-key(Str $prev) returns Str {
             p_gdbm_nextkey(self, $prev);
         }
 
-        sub p_gdbm_reorganize (File $f) returns int32 is native(HELPER) { * }
+        sub p_gdbm_reorganize (File:D $f) returns int32 is native(HELPER) { * }
 
         method reorganize() returns Int {
             p_gdbm_reorganize(self);
         }
 
-        sub p_gdbm_sync(File $f) is native(HELPER) { * }
+        sub p_gdbm_sync(File:D $f) is native(HELPER) { * }
 
         method sync() {
             p_gdbm_sync(self);
         }
 
-        sub p_gdbm_exists(File $f, Str $k) returns int32 is native(HELPER) { * }
+        sub p_gdbm_exists(File:D $f, Str $k) returns int32 is native(HELPER) { * }
         multi method exists(Str $k) returns Bool {
             my Int $rc = p_gdbm_exists(self, $k);
             return Bool($rc);
