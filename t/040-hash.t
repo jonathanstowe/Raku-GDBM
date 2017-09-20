@@ -34,7 +34,7 @@ subtest {
 
 
 
-    isa-ok $hash, GDBM, "applied one using is";
+    isa-ok $hash, GDBM, "applied one using direct assignment";
 
     nok $hash<foo>:exists, "non-existent key doesn't exist";
 
@@ -50,7 +50,7 @@ subtest {
             $file.IO.unlink;
         }
     }
-}, "applied to a scalar";
+}, "assigned to a scalar";
 
 
 
