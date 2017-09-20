@@ -14,6 +14,7 @@ lives-ok { $obj = GDBM.new($file) }, "create one";
 nok $obj.exists("foo"), "non-existent key doesn't exist";
 
 lives-ok { $obj.store("foo", "bar") }, "set a value";
+like $obj.perl, /{:foo("bar")}/, "perl looks fine";
 is $obj.fetch("foo"), "bar", "and got it back";
 ok $obj.exists("foo"), "and exists";
 lives-ok {

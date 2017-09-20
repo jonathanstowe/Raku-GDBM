@@ -123,7 +123,7 @@ class GDBM does Associative {
         );
     }
 
-    method keys(--> Seq) {
+    method keys(::?CLASS:D: --> Seq) {
         gather {
             my $key = $!file.first-key;
             while $key.defined {
@@ -133,7 +133,7 @@ class GDBM does Associative {
         }
     }
 
-    method kv(--> Seq) {
+    method kv(::?CLASS:D: --> Seq) {
         gather {
             for self.keys -> $key {
                 take $key;
@@ -142,12 +142,17 @@ class GDBM does Associative {
         }
     }
 
-    method pairs(--> Seq) {
+    method pairs(::?CLASS:D: --> Seq) {
         gather {
             for self.kv -> $k, $v {
                 take $k => $v;
             }
         }
+    }
+
+    # Copied straight from Hash
+    method perl(::?CLASS:D: --> Str ) {
+        '{' ~ self.pairs.sort.map({.perl}).join(', ') ~ '}'
     }
 }
 
