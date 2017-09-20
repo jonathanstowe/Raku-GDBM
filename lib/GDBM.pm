@@ -1,7 +1,6 @@
 use v6;
 
 use NativeCall;
-use NativeHelpers::Array;
 
 class GDBM does Associative {
 
