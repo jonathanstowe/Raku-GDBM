@@ -10,7 +10,7 @@ class GDBM does Associative {
     enum OpenMode ( Reader => 0, Writer => 1, Create => 2, New => 3);
     my constant OpenMask = 7;
     enum OpenOptions ( Fast => 0x010, Sync => 0x020, NoLock => 0x040, NoMMap => 0x080, CloExec => 0x100);
-    
+
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
     class X::Fatal is Exception {
@@ -122,5 +122,33 @@ class GDBM does Associative {
             }
         );
     }
+
+    method keys(--> Seq) {
+        gather {
+            my $key = $!file.first-key;
+            while $key.defined {
+                take $key;
+                $key = $!file.next-key($key);
+            }
+        }
+    }
+
+    method kv(--> Seq) {
+        gather {
+            for self.keys -> $key {
+                take $key;
+                take self.fetch($key) ;
+            }
+        }
+    }
+
+    method pairs(--> Seq) {
+        gather {
+            for self.kv -> $k, $v {
+                take $k => $v;
+            }
+        }
+    }
 }
+
 # vim: ft=perl6 expandtab sw=4
