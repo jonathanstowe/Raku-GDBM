@@ -2,6 +2,8 @@
 
 GNU dbm binding for Perl 6
 
+[![Build Status](https://travis-ci.org/jonathanstowe/p6-GDBM.svg?branch=master)](https://travis-ci.org/jonathanstowe/p6-GDBM)
+
 ## Synopsis
 
 ```perl6
