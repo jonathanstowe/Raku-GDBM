@@ -23,7 +23,7 @@
   "test-depends": [
   ],
   "provides": {
-    "GDBM": "lib/GDBM.h"
+    "GDBM": "lib/GDBM.pm"
   },
   "version": "0.0.1",
   "meta-version": "0",
