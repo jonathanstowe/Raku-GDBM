@@ -18,6 +18,9 @@ is $obj.fetch("foo"), "bar", "and got it back";
 ok $obj.exists("foo"), "and exists";
 lives-ok { $obj.delete("foo") }, "delete the value";
 nok $obj.exists("foo"), "non-existent key doesn't exist";
+lives-ok {
+    nok $obj.fetch("foo").defined, "returns undefined if no key";
+}, "fetch with non-existent key";
 
 
 
