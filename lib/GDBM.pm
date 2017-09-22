@@ -140,12 +140,17 @@ class GDBM does Associative {
 
     has File $!file handles <fetch store exists delete sync close>;
 
+    has Str $.filename is required;
+
     multi method new(Str() $filename) {
-        my $file = File.new(file => $filename);
-        self.new(:$file);
+        self.new(:$filename);
     }
 
-    multi submethod BUILD(File :$!file ) {
+    multi method BUILD(:$!filename!, |c) {
+        $!file = File.new(file => $!filename, |c);
+    }
+
+    multi submethod BUILD(File :$!file! ) {
     }
 
     multi method EXISTS-KEY (::?CLASS:D: $key) {
