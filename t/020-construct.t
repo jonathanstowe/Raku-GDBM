@@ -5,15 +5,30 @@ use Test;
 
 use GDBM;
 
-my $obj;
 
-lives-ok { $obj = GDBM.new('foo.db') }, "create one";
+my $filename = 'tmp-' ~ $*PID ~ '.db';
 
-isa-ok $obj, GDBM, "and it's the right sort of object";
+subtest {
+    my $obj;
+    lives-ok { $obj = GDBM.new($filename) }, "create one";
 
-ok 'foo.db'.IO.e, "and the file exists";
+    isa-ok $obj, GDBM, "and it's the right sort of object";
 
-"foo.db".IO.unlink;
+    ok $obj.filename.IO.e, "and the file exists";
+    $obj.close;
+    $filename.IO.unlink;
+}, "positional constructor";
+
+subtest {
+    my $obj;
+    lives-ok { $obj = GDBM.new(:$filename) }, "create one";
+
+    isa-ok $obj, GDBM, "and it's the right sort of object";
+
+    ok $obj.filename.IO.e, "and the file exists";
+    $obj.close;
+    $filename.IO.unlink;
+}, "named constructor";
 
 done-testing;
 # vim: expandtab shiftwidth=4 ft=perl6
