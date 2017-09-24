@@ -47,6 +47,65 @@ on different machines.
 
 =head1 METHODS
 
+As well as the listed methods a L<GDBM> object should support most of
+the methods that make sense for an L<Associative>. 
+
+=head2 method new
+
+    multi method new(Str $filename)
+    multi method new(Str :$filename!, Int :$block-size = 512, Int() :$flags = Create +| Sync +| NoMMap, Int :$mode = 0o644)
+    multi method new(GDBM::File :$file)
+
+The first form of the constructor simply takes a database filename and
+opens it with the default options as per the second form.  The C<flags>
+parameter is some combination of values of the C<enum>s L<GDBM::OpenMode>
+and L<GDBM::OpenOptions>, the default being to create the file if it
+doesn't exist, automatically sync the data and not use memory mapping of
+the data.  C<mode> is the permissions (as an octal value,) that the file
+will be created with after the application of the users file creation mask
+(umask.) The arguments to this form are identical to those of the
+underlying L<GDBM::File>.  The third variant allows you to provide a
+pre-constructed and open L<GDBM::File> if the design of your program
+might require it.
+
+=head2 method store
+
+    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Int) 
+
+This stores the supplied C<$value> under C<$key>, the default option is to
+replace the existing value for a given key, if C<GDBM::Insert> is supplied
+for C<$flag> then the value will only be stored if the key does not already
+exist in the database, if the key is already present then 1 will be returned.
+If the file is opened as a Reader only then -1 will be returned.  If the
+storage is successful then 0 will be returned.
+
+
+=head2 method fetch
+
+    method fetch(Str $key) returns Str
+
+This returns the value associated with the supplied key, or a Str type
+object if it is not present in the database.
+
+=head2 method delete
+
+    method delete(Str $k) returns Int
+
+This deletes the key (and associated value) from the database. Returning 0
+if it exists and was successful.
+
+=head2 method first-key
+
+    method first-key() returns Str
+
+
+        multi method next-key(Str $prev) returns Str {
+        method reorganize() returns Int {
+        method sync() {
+        multi method exists(Str $k) returns Bool {
+
+
+
 =end pod
 
 use NativeCall;
