@@ -70,14 +70,15 @@ might require it.
 
 =head2 method store
 
-    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Int)
+    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Bool)
 
-This stores the supplied C<$value> under C<$key>, the default option is to
-replace the existing value for a given key, if C<GDBM::Insert> is supplied
-for C<$flag> then the value will only be stored if the key does not already
-exist in the database, if the key is already present then 1 will be returned.
-If the file is opened as a Reader only then -1 will be returned.  If the
-storage is successful then 0 will be returned.
+This stores the supplied C<$value> under C<$key>, the default option
+is to replace the existing value for a given key, if C<GDBM::Insert>
+is supplied for C<$flag> then the value will only be stored if the key
+does not already exist in the database, if the key is already present
+then an exception will be thrown.  If the file is opened as a Reader
+only then an exception will be thrown.  If the storage is successful
+then True will be returned.
 
 
 =head2 method fetch
@@ -95,10 +96,11 @@ This returns True if the key supplied exists in the database.
 
 =head2 method delete
 
-    method delete(Str $k) returns Int
+    method delete(Str $k) returns Bool
 
-This deletes the key (and associated value) from the database. Returning 0
-if it exists and was successful.
+This deletes the key (and associated value) from the database. Returning True
+if it exists and was successful.  If the key isn't present or if the
+database isn't opened for writing it will return false.
 
 =head2 method first-key
 
@@ -122,7 +124,7 @@ was previously returned by C<first-key> or C<next-key>.
 
 =head2 method reorganize
 
-    method reorganize() returns Int
+    method reorganize() returns Bool
 
 Normally gdbm will reuse the space taken up by deleted items.  This can
 be used sparingly to reduce the size of the gdbm file by returning the
@@ -151,13 +153,16 @@ class GDBM does Associative {
 
     enum StoreOptions ( Insert => 0, Replace => 1 );
 
-    class X::Fatal is Exception {
+    class X::GDBM is Exception {
         has Str $.message;
+    }
+
+    class X::GDBM::Open is X::GDBM {
     }
 
     sub fail(Str $message ) {
         explicitly-manage($message);
-        X::Fatal.new(:$message).throw;
+        X::GDBM::Open.new(:$message).throw;
     }
 
     my class File is repr('CPointer') {
@@ -177,20 +182,31 @@ class GDBM does Associative {
 
         sub p_gdbm_store(File:D $f, Str $k, Str $v, uint32 $m) returns int32 is native(HELPER) { * }
 
-        multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace) returns Int {
-            p_gdbm_store(self, $k, $v, $flag.Int);
+        class X::GDBM::Store is X::GDBM {
+        }
+
+        multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace --> Bool) {
+            my Bool $rc = True;
+            my $ret = p_gdbm_store(self, $k, $v, $flag.Int);
+            if $ret == -1 {
+                X::GDBM::Store.new(message => "GDBM was not opened as a writer").throw;
+            }
+            elsif $ret == 1 {
+                X::GDBM::Store.new(message => "Key exists and 'Replace' wasn't specified").throw;
+            }
+            $rc;
         }
 
         sub p_gdbm_fetch(File:D $f, Str $k) returns Str is native(HELPER) { * }
 
-        multi method fetch(Str $k) returns Str {
+        multi method fetch(Str $k --> Str) {
             p_gdbm_fetch(self, $k);
         }
 
         sub p_gdbm_delete(File:D $f, Str $k) returns int32 is native(HELPER) { * }
 
-        multi method delete(Str $k) returns Int {
-            p_gdbm_delete(self, $k);
+        multi method delete(Str $k --> Bool) {
+            !p_gdbm_delete(self, $k);
         }
 
         # For the methods of these we'll just return the Datum as
@@ -198,21 +214,22 @@ class GDBM does Associative {
 
         sub p_gdbm_firstkey(File:D $f) returns Str is native(HELPER) { * }
 
-        multi method first-key() returns Str {
+        multi method first-key(--> Str) {
             p_gdbm_firstkey(self);
         }
 
 
         sub p_gdbm_nextkey(File:D $f, Str $prev) returns Str is native(HELPER) { * }
 
-        multi method next-key(Str $prev) returns Str {
+        multi method next-key(Str $prev --> Str) {
             p_gdbm_nextkey(self, $prev);
         }
 
         sub p_gdbm_reorganize (File:D $f) returns int32 is native(HELPER) { * }
 
-        method reorganize() returns Int {
-            p_gdbm_reorganize(self);
+        method reorganize(--> Bool) {
+            my $rc = p_gdbm_reorganize(self);
+            Bool($rc);
         }
 
         sub p_gdbm_sync(File:D $f) is native(HELPER) { * }
@@ -222,13 +239,13 @@ class GDBM does Associative {
         }
 
         sub p_gdbm_exists(File:D $f, Str $k) returns int32 is native(HELPER) { * }
-        multi method exists(Str $k) returns Bool {
+        multi method exists(Str $k --> Bool) {
             my Int $rc = p_gdbm_exists(self, $k);
             return Bool($rc);
         }
     }
 
-    has File $!file handles <fetch store exists delete sync close>;
+    has File $!file handles <fetch store exists delete sync close reorganize>;
 
     has Str $.filename is required;
 
