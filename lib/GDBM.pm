@@ -98,13 +98,26 @@ if it exists and was successful.
 
     method first-key() returns Str
 
+This returns the first key in the database or an undefined Str type object
+if there are no entries in the database,  This is the interface provided
+by the C<gdbm> library, but you probably want to use C<keys> as provided
+by the Associative interface unless you have special needs.  The keys
+aren't returned in a particular order as it is defined by the hashing
+algorithm,
 
-        multi method next-key(Str $prev) returns Str {
+=head2 method next-key
+
+    method next-key(Str $prev) returns Str
+
+Returns the next available key from the database or a Str type object
+if there are no more entries.  The argument is a defined key that
+was previously returned by C<first-key> or C<next-key>.
+
+
+
         method reorganize() returns Int {
         method sync() {
         multi method exists(Str $k) returns Bool {
-
-
 
 =end pod
 
