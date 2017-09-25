@@ -5,7 +5,7 @@ use Test;
 
 use GDBM;
 
-my $file = "hash-test.db";
+my $file = "tmp-" ~ $*PID ~ '.db';
 
 my $obj;
 
@@ -14,6 +14,8 @@ lives-ok { $obj = GDBM.new($file) }, "create one";
 nok $obj.exists("foo"), "non-existent key doesn't exist";
 
 lives-ok { $obj.store("foo", "bar") }, "set a value";
+throws-like { $obj.store('foo', 'bar', GDBM::Insert) }, X::GDBM::Store, "store throws with Insert";
+
 like $obj.perl, /{:foo("bar")}/, "perl looks fine";
 is $obj.fetch("foo"), "bar", "and got it back";
 ok $obj.exists("foo"), "and exists";
@@ -55,6 +57,12 @@ lives-ok {
     nok (my @keys = $obj.keys), "get keys shouldn't be any";
 }, "keys no elements";
 
+lives-ok { $obj.store((foo => 'bar')) }, "store with Pair";
+lives-ok { $obj.close }, "close it";
+
+lives-ok { $obj = GDBM.new($file) }, "re-open it to check we really are using file";
+
+is $obj.fetch("foo"), "bar", "and got back the stored value";
 
 
 
