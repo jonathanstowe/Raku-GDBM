@@ -48,7 +48,7 @@ on different machines.
 =head1 METHODS
 
 As well as the listed methods a L<GDBM> object should support most of
-the methods that make sense for an L<Associative>. 
+the methods that make sense for an L<Associative>.
 
 =head2 method new
 
@@ -70,7 +70,7 @@ might require it.
 
 =head2 method store
 
-    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Int) 
+    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Int)
 
 This stores the supplied C<$value> under C<$key>, the default option is to
 replace the existing value for a given key, if C<GDBM::Insert> is supplied
@@ -86,6 +86,12 @@ storage is successful then 0 will be returned.
 
 This returns the value associated with the supplied key, or a Str type
 object if it is not present in the database.
+
+=head2 method exists
+
+    multi method exists(Str $key) returns Bool
+
+This returns True if the key supplied exists in the database.
 
 =head2 method delete
 
@@ -114,10 +120,22 @@ if there are no more entries.  The argument is a defined key that
 was previously returned by C<first-key> or C<next-key>.
 
 
+=head2 method reorganize
 
-        method reorganize() returns Int {
-        method sync() {
-        multi method exists(Str $k) returns Bool {
+    method reorganize() returns Int
+
+Normally gdbm will reuse the space taken up by deleted items.  This can
+be used sparingly to reduce the size of the gdbm file by returning the
+space used by deleted items.
+
+=head2 method sync
+
+    method sync()
+
+If you didn't provide L<Sync> in the flags to the constructor then, e.g.
+store and delete operations may not be completely written to disk before
+they return. Calling this will ensure all pending changes are flushed
+to disk.  It does not return until the disk file is completely written.
 
 =end pod
 
