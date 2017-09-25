@@ -70,7 +70,8 @@ might require it.
 
 =head2 method store
 
-    method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Bool)
+    multi method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Bool)
+    multi method store(Pair $p, StoreOptions $flag = Replace --> Bool)
 
 This stores the supplied C<$value> under C<$key>, the default option
 is to replace the existing value for a given key, if C<GDBM::Insert>
@@ -185,6 +186,8 @@ class GDBM does Associative {
         class X::GDBM::Store is X::GDBM {
         }
 
+        proto method store(|c) { * }
+
         multi method store(Str:D $k, Str:D $v, StoreOptions $flag = Replace --> Bool) {
             my Bool $rc = True;
             my $ret = p_gdbm_store(self, $k, $v, $flag.Int);
@@ -197,15 +200,19 @@ class GDBM does Associative {
             $rc;
         }
 
+        multi method store(Pair:D $pair ( Str :$key, Str :$value ), StoreOptions $flag = Replace --> Bool) {
+            self.store($key, $value);
+        }
+
         sub p_gdbm_fetch(File:D $f, Str $k) returns Str is native(HELPER) { * }
 
-        multi method fetch(Str $k --> Str) {
+        method fetch(Str $k --> Str) {
             p_gdbm_fetch(self, $k);
         }
 
         sub p_gdbm_delete(File:D $f, Str $k) returns int32 is native(HELPER) { * }
 
-        multi method delete(Str $k --> Bool) {
+        method delete(Str $k --> Bool) {
             !p_gdbm_delete(self, $k);
         }
 
