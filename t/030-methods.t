@@ -58,11 +58,13 @@ lives-ok {
 }, "keys no elements";
 
 lives-ok { $obj.store((foo => 'bar')) }, "store with Pair";
+lives-ok { $obj.store(baz => 'boom', flub => 'blub') }, "store with slurpy";
 lives-ok { $obj.close }, "close it";
 
 lives-ok { $obj = GDBM.new($file) }, "re-open it to check we really are using file";
 
 is $obj.fetch("foo"), "bar", "and got back the stored value";
+is $obj.fetch('baz'), "boom", "and the other one";
 
 
 

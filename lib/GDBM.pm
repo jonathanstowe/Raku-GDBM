@@ -72,6 +72,7 @@ might require it.
 
     multi method store(Str:D $key, Str:D $value, StoreOptions $flag = Replace --> Bool)
     multi method store(Pair $p, StoreOptions $flag = Replace --> Bool)
+    multi method store(*%items --> Bool)
 
 This stores the supplied C<$value> under C<$key>, the default option
 is to replace the existing value for a given key, if C<GDBM::Insert>
@@ -79,7 +80,8 @@ is supplied for C<$flag> then the value will only be stored if the key
 does not already exist in the database, if the key is already present
 then an exception will be thrown.  If the file is opened as a Reader
 only then an exception will be thrown.  If the storage is successful
-then True will be returned.
+then True will be returned. The third variamt is provided for completeness
+allowing the pairs to be expressed like named arguments,
 
 
 =head2 method fetch
@@ -202,6 +204,13 @@ class GDBM does Associative {
 
         multi method store(Pair:D $pair ( Str :$key, Str :$value ), StoreOptions $flag = Replace --> Bool) {
             self.store($key, $value);
+        }
+
+        multi method store(*%items --> Bool) {
+            for %items.pairs -> $p {
+                self.store($p)
+            }
+            True;
         }
 
         sub p_gdbm_fetch(File:D $f, Str $k) returns Str is native(HELPER) { * }
