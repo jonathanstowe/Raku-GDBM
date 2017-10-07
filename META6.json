@@ -8,6 +8,7 @@
   },
   "perl": "6.c",
   "resources": [
+	"libraries/gdbmhelper"
   ],
   "build-depends": [
       "LibraryMake",
