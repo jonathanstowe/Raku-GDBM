@@ -185,6 +185,8 @@ class GDBM does Associative {
 
         sub p_gdbm_store(File:D $f, Str $k, Str $v, uint32 $m) returns int32 is native(HELPER) { * }
 
+        sub p_gdbm_last_errno_strerror(File:D $f) returns Str is native(HELPER) { * }
+
         class X::GDBM::Store is X::GDBM {
         }
 
@@ -194,7 +196,13 @@ class GDBM does Associative {
             my Bool $rc = True;
             my $ret = p_gdbm_store(self, $k, $v, $flag.Int);
             if $ret == -1 {
-                X::GDBM::Store.new(message => "GDBM was not opened as a writer").throw;
+                with p_gdbm_last_errno_strerror(self) -> $message {
+                    X::GDBM::Store.new(:$message).throw;
+                }
+                else {
+                    # What is the correct error message here?
+                    X::GDBM::Store.new(message => "GDBM was not opened as a writer").throw;
+                }
             }
             elsif $ret == 1 {
                 X::GDBM::Store.new(message => "Key exists and 'Replace' wasn't specified").throw;

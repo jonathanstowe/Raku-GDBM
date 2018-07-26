@@ -26,6 +26,14 @@ int p_gdbm_store (GDBM_FILE file, char *key, char *value, int flags) {
     return gdbm_store(file, key_d, value_d, flags);
 }
 
+const char *p_gdbm_last_errno_strerror(GDBM_FILE file) {
+  gdbm_error errno = gdbm_last_errno(file);
+  if (errno == GDBM_NO_ERROR)
+    return NULL;
+  else 
+    return gdbm_strerror(errno);
+}
+
 char *p_gdbm_fetch (GDBM_FILE file, char *key) {
     datum val, key_d;
     char *ret;
