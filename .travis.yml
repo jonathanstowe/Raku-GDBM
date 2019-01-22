@@ -7,6 +7,7 @@ sudo: required
 perl6:
   - latest
 install:
+  - sudo apt-get install -y libgdbm3
   - sudo apt-get install -y libgdbm-dev
   - rakudobrew build-zef
   - zef --/test --deps-only install .
