@@ -1,6 +1,6 @@
 # GDBM
 
-GNU dbm binding for Perl 6
+GNU dbm binding for Raku
 
 [![Build Status](https://travis-ci.org/jonathanstowe/p6-GDBM.svg?branch=master)](https://travis-ci.org/jonathanstowe/p6-GDBM)
 
@@ -51,7 +51,7 @@ on Linux this may be either *libgdbm-dev* or *libgdbm-devel* depending
 on the distribution.  For FreeBSD the *database/gdbm* port will install
 everything that is required. 
 
-Assuming that you have a working installation of Rakudo Perl 6 you should
+Assuming that you have a working installation of Rakudo you should
 be able to install this with *zef* :
 
      zef install GDBM
@@ -64,11 +64,11 @@ be able to install this with *zef* :
 
 The gdbm library itself is mature and well tested so it's likely that any
 bugs you find are ones I have introduced into the wrapper.  I'd rather
-do without the C wrapper but the gdbm api is rather awkward for Perl 6
+do without the C wrapper but the gdbm api is rather awkward for Rakudo
 NativeCall to deal with otherwise.
 
 If you have any suggestions/fixes or actual bugs please report them to
-https://github.com/jonathanstowe/p6-GDBM/issues 
+https://github.com/jonathanstowe/Raku-GDBM/issues 
 
 ## Licence & Copyright
 
