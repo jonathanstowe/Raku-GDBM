@@ -8,7 +8,7 @@ perl6:
   - latest
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y libgdbm3
+  - sudo apt-get install -y libgdbm
   - sudo apt-get install -y libgdbm-dev
   - wget https://launchpad.net/ubuntu/+archive/primary/+files/libgdbm3_1.8.3-13.1_amd64.deb
   - sudo dpkg -i libgdbm3_1.8.3-13.1_amd64.deb

@@ -1,16 +1,17 @@
 {
   "name": "GDBM",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "auth": "github:jonathanstowe",
   "api": "1.0",
-  "description": "GNU dbm binding for Perl 6",
-  "source-url": "https://github.com/jonathanstowe/p6-GDBM.git",
+  "description": "GNU dbm binding for Raku",
+  "source-url": "https://github.com/jonathanstowe/Raku-GDBM.git",
   "support": {
-    "source": "https://github.com/jonathanstowe/p6-GDBM.git",
-    "bugtracker" : "https://github.com/jonathanstowe/p6-GDBM/issues",
+    "source": "https://github.com/jonathanstowe/Raku-GDBM.git",
+    "bugtracker" : "https://github.com/jonathanstowe/Raku-GDBM/issues",
     "email" : "jns+gh@gellyfish.co.uk"
   },
   "perl": "6.*",
+  "raku": "6.*",
   "resources": [
 	"libraries/gdbmhelper"
   ],
@@ -32,5 +33,5 @@
   "authors": [
     "Jonathan Stowe <jns+gh@gellyfish.co.uk>"
   ],
-  "meta-version": "0"
+  "meta-version": "1"
 }
