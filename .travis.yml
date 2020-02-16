@@ -8,7 +8,7 @@ perl6:
   - latest
 before_install:
   - sudo apt update
-  - sudo install libgdbm-dev
+  - sudo apt install libgdbm-dev
 install:
   - rakudobrew build-zef
   - zef --deps-only install .
