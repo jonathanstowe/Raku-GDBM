@@ -278,7 +278,7 @@ class GDBM does Associative {
         self.new(:$filename);
     }
 
-    multi method BUILD(:$!filename!, |c) {
+    multi submethod BUILD(:$!filename!, |c) {
         $!file = File.new(file => $!filename, |c);
     }
 
