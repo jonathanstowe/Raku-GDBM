@@ -2,7 +2,7 @@
 
 GNU dbm binding for Raku
 
-[![Build Status](https://travis-ci.org/jonathanstowe/p6-GDBM.svg?branch=master)](https://travis-ci.org/jonathanstowe/p6-GDBM)
+![Build Status](https://github.com/jonathanstowe/Raku-GDBM/workflows/CI/badge.svg)
 
 ## Synopsis
 
