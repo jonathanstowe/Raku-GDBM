@@ -15,18 +15,29 @@
   "resources": [
 	"libraries/gdbmhelper"
   ],
-  "build-depends": [
-      "LibraryMake",
-      "Shell::Command"
-  ],
-  "depends": [
-  ],
+  "depends": {
+     "build" : {
+        "requires" : [
+           "Distribution::Builder::MakeFromJSON:ver<0.6+>"
+        ]
+     },
+     "runtime": {
+        "requires": [
+           "gdbm:from<native>"
+        ]
+     }
+  },
+  "builder": "Distribution::Builder::MakeFromJSON",
+  "build" : {
+     "src-dir" : "src",
+     "makefile-variables" : {
+        "gdbmhelper": {"resource": "libraries/gdbmhelper"}
+     }
+  },
   "tags": [
       "gdbm", "dbm", "hash"
   ],
   "license": "Artistic-2.0",
-  "test-depends": [
-  ],
   "provides": {
     "GDBM": "lib/GDBM.pm"
   },
