@@ -1,6 +1,6 @@
 {
   "name": "GDBM",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "auth": "github:jonathanstowe",
   "api": "1.0",
   "description": "GNU dbm binding for Raku",

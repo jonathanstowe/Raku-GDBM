@@ -51,8 +51,7 @@ on Linux this may be either *libgdbm-dev* or *libgdbm-devel* depending
 on the distribution.  For FreeBSD the *database/gdbm* port will install
 everything that is required. 
 
-Assuming that you have a working installation of Rakudo you should
-be able to install this with *zef* :
+Assuming that you have a working installation of Rakudo you should be able to install this with *zef* :
 
      zef install GDBM
 
@@ -74,5 +73,5 @@ https://github.com/jonathanstowe/Raku-GDBM/issues
 
 This is free software, please see the [LICENCE](LICENCE) file for details.
 
-© Jonathan Stowe 2017 - 2019
+© Jonathan Stowe 2017 - 2021
 
