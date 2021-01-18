@@ -33,10 +33,6 @@
       "type": "file"
     },
     {
-      "name": "Build.pm",
-      "type": "file"
-    },
-    {
       "purpose": null,
       "type": "directory",
       "name": "lib",
@@ -45,10 +41,6 @@
           "name": "GDBM.pm",
           "type": "file"
         },
-        {
-          "type": "file",
-          "name": "GDBM.pm.rev-deps"
-        }
       ]
     },
     {
