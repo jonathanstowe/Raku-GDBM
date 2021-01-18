@@ -40,7 +40,7 @@
         {
           "name": "GDBM.pm",
           "type": "file"
-        },
+        }
       ]
     },
     {
