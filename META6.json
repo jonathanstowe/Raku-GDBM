@@ -1,48 +1,46 @@
 {
-  "name": "GDBM",
-  "version": "0.1.0",
-  "auth": "github:jonathanstowe",
-  "api": "1.0",
-  "description": "GNU dbm binding for Raku",
-  "source-url": "https://github.com/jonathanstowe/Raku-GDBM.git",
-  "support": {
-    "source": "https://github.com/jonathanstowe/Raku-GDBM.git",
-    "bugtracker" : "https://github.com/jonathanstowe/Raku-GDBM/issues",
-    "email" : "jns+gh@gellyfish.co.uk"
-  },
-  "perl": "6.*",
-  "raku": "6.*",
-  "resources": [
-	"libraries/gdbmhelper"
-  ],
-  "depends": {
-     "build" : {
-        "requires" : [
-           "Distribution::Builder::MakeFromJSON:ver<0.6+>"
-        ]
-     },
-     "runtime": {
-        "requires": [
-           "gdbm:from<native>"
-        ]
-     }
-  },
-  "builder": "Distribution::Builder::MakeFromJSON",
-  "build" : {
-     "src-dir" : "src",
-     "makefile-variables" : {
-        "gdbmhelper": {"resource": "libraries/gdbmhelper"}
-     }
-  },
-  "tags": [
-      "gdbm", "dbm", "hash"
-  ],
   "license": "Artistic-2.0",
+  "auth": "zef:jonathanstowe",
+  "test-depends": [
+  ],
+  "source-url": "https://github.com/jonathanstowe/Raku-GDBM.git",
+  "meta-version": "1",
+  "name": "GDBM",
   "provides": {
     "GDBM": "lib/GDBM.pm"
   },
+  "tags": [
+    "gdbm",
+    "dbm",
+    "hash"
+  ],
+  "description": "GNU dbm binding for Raku",
+  "api": "1.0",
+  "build-depends": [
+  ],
+  "version": "0.1.1",
+  "raku": "6.*",
   "authors": [
     "Jonathan Stowe <jns+gh@gellyfish.co.uk>"
   ],
-  "meta-version": "1"
+  "support": {
+    "bugtracker": "https://github.com/jonathanstowe/Raku-GDBM/issues",
+    "source": "https://github.com/jonathanstowe/Raku-GDBM.git",
+    "email": "jns+gh@gellyfish.co.uk"
+  },
+  "resources": [
+    "libraries/gdbmhelper"
+  ],
+  "depends": {
+    "runtime": {
+      "requires": [
+        "gdbm:from<native>"
+      ]
+    },
+    "build": {
+      "requires": [
+        "Distribution::Builder::MakeFromJSON:ver<0.6+>"
+      ]
+    }
+  }
 }
