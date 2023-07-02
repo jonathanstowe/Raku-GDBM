@@ -5,7 +5,7 @@
   "meta-version": "1",
   "name": "GDBM",
   "provides": {
-    "GDBM": "lib/GDBM.pm"
+    "GDBM": "lib/GDBM.rakumod"
   },
   "tags": [
     "gdbm",
@@ -14,7 +14,7 @@
   ],
   "description": "GNU dbm binding for Raku",
   "api": "1.0",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "raku": "6.*",
   "authors": [
     "Jonathan Stowe <jns+gh@gellyfish.co.uk>"

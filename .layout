@@ -38,7 +38,7 @@
       "name": "lib",
       "children": [
         {
-          "name": "GDBM.pm",
+          "name": "GDBM.rakumod",
           "type": "file"
         }
       ]
