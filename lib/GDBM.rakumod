@@ -148,7 +148,7 @@ use NativeCall;
 
 class GDBM does Associative {
 
-    my constant HELPER = %?RESOURCES<libraries/gdbmhelper>.Str;
+    my constant HELPER = %?RESOURCES<libraries/gdbmhelper>;
 
     enum OpenMode ( Reader => 0, Writer => 1, Create => 2, New => 3);
     my constant OpenMask = 7;
